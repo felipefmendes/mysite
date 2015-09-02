@@ -1,0 +1,193 @@
+-- Github
+git init (Para iniciar um repositorio no git)
+
+git status (Para saber o Status do projeto)
+
+git add octocat.txt (Para começar a monitorar as alteracôes no arquivo octocat.txt)
+
+git commit -m "add cute octocat story" (Para armazenar as alterações que foram realizadas nos arquivos e escrever um comentário)
+
+git add '*.txt' (Para adicionar vários arquivos do repositório no temp)
+
+git commit -m'Add all the octocat txt files' (Para comitar alteração em todos os arquivos que foram jogados no temp previamente)
+
+git log (Para verificar os commits que foram realizados , os comentários dos mesmos)
+
+git remote add origin https://github.com/try-git/try_git.git (Para enviar o repositório local para um servidor na web o origin é um alias) 
+
+git push -u origin master (Para enviar para o servidor gravado acima, o origin , de modo que o -u irá memorizar o repositório jogando no master)
+---------------------------------------------------
+-- Django
+
+$ python -c "import django; print(django.get_version())" #Para saber qual a versão do Django está instalada , caso apresente erros a mensagem "No module named django" será apresentada
+
+$ django-admin startproject mysite # No diretório que o código será armazenado, o comando acima irá criar o projeto atual , neste caso com o nome mysite
+
+# O projeto irá criar um projeto de nome mysite com o seguinte padrão
+mysite/
+    manage.py
+    mysite/
+        __init__.py
+        settings.py
+        urls.py
+        wsgi.py
+
+mysite/ - O projeto pode ser renomeado
+
+manage.py -  arquivo responsável por interegir com o projeto de diversas maneiras
+
+mysite/ -  O segundo my site é o pacote do projeto, para importar esse projeto deve ser passado o nome do projeto .urls (mysite.urls)
+
+mysite/__init__.py - Um arquivo que informa ao python que o diretório pode ser considerado um pacote do python.
+
+mysite/settings.py - Settings e configurações do projeto Django.
+
+mysite/urls.py - As URLs declaradas no projeto
+
+mysite/wsgi.py - um ponto de entrada para WSGI ,compatível com web servers para o projeto.
+
+mysite/settings.py {
+	
+	A base padrão para o python é SQLite porém PostgreeSQL é mais robusta
+
+	A base SQLite é criada automaticamente quando necessário.
+
+	alterar a TIME_ZONE para TIME_ZONE = 'America/Sao_Paulo'
+
+	INSTALLED_APPS - armazena as aplicações do Django no projeto. {
+
+
+    django.contrib.admin – Arquivo administrador do site.
+    django.contrib.auth – Arquivo de autenticação do sistema
+    django.contrib.contenttypes – Uma framework que armazena os tipos
+    django.contrib.sessions – Framework de sessões
+    django.contrib.messages – Framework de mensagens
+    django.contrib.staticfiles – A framework de armazenamento dos arquivos estáticos
+
+    $ python manage.py migrate #Comando para criar as tabelas na base para utilização , verificando os INSTALLED_APPS e cria as tabelas necessárias deste.
+
+    Se necessário , apague as linhas que desejar não criar antes de rodar o migrate.
+
+    }
+}
+
+The development server
+
+Mude para o diretório mysite e rode o comando
+
+$ python manage.py runserver
+
+Para fechar , pressione CONTROL + C.
+
+Este é o servidor local , para acessar digite 
+
+ http://127.0.0.1:8000/ no navegador.
+
+ Para alterar a porta, rode 
+ $ python manage.py runserver 8080
+
+ Para alterar o ip e a porta, rode
+ $ python manage.py runserver 0.0.0.0:8000
+
+ Ele reinicia o servidor com qualquer alteração do código, porém é necessário reiniciar dependendo do caso.
+
+ Projects vs. apps
+
+ O app e uma Web application que faz algo, um weblog system, base de dados pública
+
+ O projeto é uma coleção de configurações a apps de um site em particular
+
+ Um projeto pode ter vários apps e vice e versa.
+
+ Para criar apps faça o comando abaixo no mesmo diretório do manage.py
+
+ $ python manage.py startapp polls
+
+ polls/
+    __init__.py
+    admin.py
+    migrations/
+        __init__.py
+    models.py
+    tests.py
+    views.py
+
+no arquivo models.py, deve ser criado suas classes Choice e Question
+
+ polls/models.py {
+
+from django.db import models
+
+class Question(models.Model):
+    question_text = models.CharField(max_length=200)
+    pub_date = models.DateTimeField('date published')
+
+class Choice(models.Model):
+    question = models.ForeignKey(Question)
+    choice_text = models.CharField(max_length=200)
+    votes = models.IntegerField(default=0)
+
+Cada modelo é representado pelas classes e subclasses django.db.models.Model
+
+Primeiramente vem o nome da variável e após a classe o tipo de informação que a mesma irá receber.
+
+ }
+mysite/settings.py {
+	
+    INSTALLED_APPS = (
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'polls',)
+
+Deve ser incluído polls app para que o para que o Django entenda que deve ser incluído tal comando.
+
+$ python manage.py makemigrations polls
+
+makemigrations está sendo informado para o Django que foi realizada algumas mudanças (criada novas)e está sendo colocado no temporário.
+
+para a migração, é criado o arquivo
+polls/migrations/0001_initial.py
+
+}
+SQLMigrate
+$ python manage.py sqlmigrate polls 0001
+
+BEGIN;
+CREATE TABLE "polls_choice" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "choice_text" varchar(200) NOT NULL,
+    "votes" integer NOT NULL
+);
+CREATE TABLE "polls_question" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "question_text" varchar(200) NOT NULL,
+    "pub_date" timestamp with time zone NOT NULL
+);
+ALTER TABLE "polls_choice" ADD COLUMN "question_id" integer NOT NULL;
+ALTER TABLE "polls_choice" ALTER COLUMN "question_id" DROP DEFAULT;
+CREATE INDEX "polls_choice_7aa0f6ee" ON "polls_choice" ("question_id");
+ALTER TABLE "polls_choice"
+  ADD CONSTRAINT "polls_choice_question_id_246c99a640fbbd72_fk_polls_question_id"
+    FOREIGN KEY ("question_id")
+    REFERENCES "polls_question" ("id")
+    DEFERRABLE INITIALLY DEFERRED;
+
+COMMIT;
+
+para verificar problemas no projeto "python manage.py check;" 
+
+deve ser executado novamente o migrate para criar os novos modelos
+
+$ python manage.py migrate
+
+o comando migrate pega todas as migrações que não foram aplicadas e armazena em uma base django_migrations e armazena na database.
+
+
+  Deve ser alterado os modelos em (models.py).
+  Rode python manage.py makemigrations para criar as migrações para as mudanças
+  Rode python manage.py migrate para aplicar essas mudanças na base de dados.
+
